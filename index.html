@@ -1488,7 +1488,7 @@
             }).catch(err => console.log('SW failed', err));
           });
         }
- // --- מערכת זיהוי קול למצב נסיעה (Speech to Text) ---
+// --- מערכת זיהוי קול למצב נסיעה (Speech to Text) ---
         let recognition;
         let isListening = false;
         let wasDriveMode = false;
@@ -1522,7 +1522,7 @@
             // האקר חכם שמדליק/מכבה את התפריט לפי מתג מצב הנסיעה הראשי
             setInterval(() => {
                 let micArea = document.getElementById('micArea');
-                let currentDriveState = (typeof isDriveMode !== 'undefined') ? isDriveMode : false; 
+                let currentDriveState = (typeof isDrivingMode !== 'undefined') ? isDrivingMode : false; 
                 
                 if(micArea) {
                     if(currentDriveState && !wasDriveMode) {
@@ -1543,7 +1543,7 @@
         const originalSpeak = window.speechSynthesis.speak.bind(window.speechSynthesis);
         window.speechSynthesis.speak = function(utterance) {
             let modeElement = document.getElementById('driveInteraction');
-            let isDrive = (typeof isDriveMode !== 'undefined') ? isDriveMode : false; 
+            let isDrive = (typeof isDrivingMode !== 'undefined') ? isDrivingMode : false; 
             // אם מצב נסיעה דולק, בחרת לענות בעצמך, והיא מנסה להקריא עברית - נחסום אותה!
             if (isDrive && modeElement && modeElement.value === 'speak' && utterance.lang === 'he-IL') {
                 return; 
@@ -1553,7 +1553,7 @@
 
         function toggleInteractionMode() {
             let mode = document.getElementById('driveInteraction').value;
-            let currentDriveState = (typeof isDriveMode !== 'undefined') ? isDriveMode : false; 
+            let currentDriveState = (typeof isDrivingMode !== 'undefined') ? isDrivingMode : false; 
             
             if (mode === 'listen') {
                 // מסתיר את המיקרופון ומכבה אותו
@@ -1592,7 +1592,7 @@
             };
 
             recognition.onend = function() {
-                let isDrive = (typeof isDriveMode !== 'undefined') ? isDriveMode : false; 
+                let isDrive = (typeof isDrivingMode !== 'undefined') ? isDrivingMode : false; 
                 let mode = document.getElementById('driveInteraction') ? document.getElementById('driveInteraction').value : 'speak';
                 
                 // ממשיך להקשיב בלופ רק אם אנחנו במצב נסיעה ואתה בחרת לענות
