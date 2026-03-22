@@ -1610,22 +1610,29 @@
             else { try { recognition.start(); } catch(e) {} }
         }
 
-        function checkSpokenAnswer(spokenText) {
+       function checkSpokenAnswer(spokenText) {
             if(currentList.length === 0) return;
             let word = currentList[currentIndex];
             let correctHe = (editedTranslations[word.en] || word.he).toLowerCase();
             
+            // מזהה שאמרת "דלג" או "לא יודע"
             if (spokenText.includes("דלג") || spokenText.includes("לא יודע") || spokenText.includes("עבור")) {
                 let fb = document.getElementById('micFeedback'); if(fb) fb.innerText = `אמרת: "לא יודע". מדלג...`;
-                markWord('learning'); return;
+                clearTimeout(drivingTimeout); // חותך את שעון העצר!
+                window.speechSynthesis.cancel(); // משתיק את ההקראה!
+                markWord('learning'); // לוחץ על אדום
+                return;
             }
 
+            // בודק אם ענית נכון
             let correctWords = correctHe.split(/[,|\/]/).map(w => w.trim());
             let isCorrect = correctWords.some(cw => spokenText.includes(cw) || cw.includes(spokenText));
 
             if (isCorrect) {
                 let fb = document.getElementById('micFeedback'); if(fb) fb.innerText = `אלוף! אמרת: "${spokenText}"`;
-                markWord('known');
+                clearTimeout(drivingTimeout); // חותך את שעון העצר!
+                window.speechSynthesis.cancel(); // משתיק את ההקראה!
+                markWord('known'); // לוחץ על ירוק
             } else {
                 let fb = document.getElementById('micFeedback'); if(fb) fb.innerText = `שמעתי: "${spokenText}" (נסה שוב או תגיד "דלג")`;
             }
