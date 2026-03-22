@@ -404,8 +404,66 @@
         let isAdminMode = false;
         let currentTextId = null;
 
-        function initApp() {
+      async function initApp() {
             if(isDarkMode) document.body.classList.add('dark-mode');
+            
+            // --- מנגנון שאיבת המילים מהשרת של גיטהאב ---
+            if (!localStorage.getItem('isFirstLoadComplete')) {
+                try {
+                    const response = await fetch('./vocab_backup.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        let importedProgress = data.progress || data; 
+                        for (let key in importedProgress) { if(importedProgress[key].status || importedProgress[key].known !== undefined) { userProgress[key] = importedProgress[key]; } }
+                        let importedCustom = data.custom || (Array.isArray(data) ? data : []); 
+                        if(importedCustom.length > 0 && !importedCustom[0].en && importedCustom[0].custom) importedCustom = importedCustom[0].custom;
+
+                        let existingKeys = new Set(customWords.map(w => w.en.toLowerCase() + '_' + w.source));
+                        importedCustom.forEach(cw => { 
+                            let src = cw.source || 'Custom';
+                            let key = cw.en.toLowerCase() + '_' + src;
+                            if (cw.en && !existingKeys.has(key)) { 
+                                customWords.push(cw); 
+                                existingKeys.add(key); 
+                            } 
+                        });
+                        
+                        let importedTexts = data.texts || data.customTexts || [];
+                        let existingTextIds = new Set(customTexts.map(t => t.id));
+                        importedTexts.forEach(t => { if(t.id && !existingTextIds.has(t.id)) { customTexts.push(t); existingTextIds.add(t.id); } });
+
+                        let importedTextProgress = data.textProgress || {};
+                        for (let key in importedTextProgress) { textProgress[key] = importedTextProgress[key]; }
+
+                        if(data.streak) streak = data.streak; 
+                        let importedTranslations = data.editedTranslations || {}; for (let key in importedTranslations) { editedTranslations[key] = importedTranslations[key]; }
+                        let importedSentences = data.customSentences || {}; for (let key in importedSentences) { customSentences[key] = importedSentences[key]; }
+                        let importedAssocs = data.customAssocs || {}; for (let key in importedAssocs) { customAssocs[key] = importedAssocs[key]; }
+                        
+                        for (let wordEn in userProgress) { if (userProgress[wordEn].known === true) { userProgress[wordEn].status = 'known'; delete userProgress[wordEn].known; } else if (userProgress[wordEn].known === false) { userProgress[wordEn].status = 'learning'; delete userProgress[wordEn].known; } } 
+                        
+                        localStorage.setItem('customVocab', JSON.stringify(customWords)); 
+                        localStorage.setItem('customTexts', JSON.stringify(customTexts));
+                        localStorage.setItem('textProgress', JSON.stringify(textProgress));
+                        localStorage.setItem('editedTranslations', JSON.stringify(editedTranslations)); 
+                        localStorage.setItem('customSentences', JSON.stringify(customSentences)); 
+                        localStorage.setItem('customAssocs', JSON.stringify(customAssocs)); 
+                        
+                        uniqueWordsMap.clear();
+                        rawData.forEach(item => { let p = item.split('|'); if(p.length >= 4) { let w = { en: p[0], he: p[1], level: p[2], unit: p[3], source: 'Kidum' }; uniqueWordsMap.set(p[0].toLowerCase() + '_Kidum', w); } });
+                        customWords.forEach(cw => { let src = cw.source || 'Custom'; uniqueWordsMap.set(cw.en.toLowerCase() + '_' + src, cw); });
+                        allWords = Array.from(uniqueWordsMap.values());
+                        
+                        saveProgress();
+                    }
+                } catch (err) {
+                    console.log("No backup file found on server, using default data.");
+                }
+                localStorage.setItem('isFirstLoadComplete', 'true');
+            }
+            // ------------------------------------
+
             document.getElementById('streakDisplay').innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2"><path d="M17.657 14.832c0 2.871-2.42 5.168-5.657 5.168-3.237 0-5.657-2.297-5.657-5.168 0-2.41 1.76-4.524 4.026-5.048-.68 1.48-.124 2.83.63 3.655.087-.96.657-2.203 1.95-3.327 1.848-1.606 2.37-3.953 2.062-6.112 3.037 2.274 4.613 5.485 4.613 8.214a1.002 1.002 0 0 1-.005.105c-.015-.436-.184-1.078-.616-1.895 1.09 1.155 1.654 2.716 1.654 4.408z"/></svg> רצף: ${streak}`;
             populateFilters(); applyFilters(); renderReadingTexts(); renderSentenceQuestions();
         }
