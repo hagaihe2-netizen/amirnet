@@ -1602,8 +1602,7 @@
                 clearTimeout(drivingTimeout);
             }
         }
-
-        function playNextDrivingWord() {
+function playNextDrivingWord() {
             if(!isDrivingMode) return;
             if(currentIndex >= currentList.length) currentIndex = 0; 
             
@@ -1647,15 +1646,17 @@
                 let mode = document.getElementById('driveInteraction') ? document.getElementById('driveInteraction').value : 'speak';
                 let waitTime = (mode === 'listen') ? 1500 : waitingTime; 
 
-                // --- הקסם: מדליקים את המיקרופון רק לזמן ההמתנה ---
-                if (mode === 'speak') {
-                    try { 
-                        if (!recognition) initSpeech();
-                        recognition.start(); 
-                        isListening = true;
-                        let btn = document.getElementById('micBtn'); if(btn) btn.classList.add('mic-listening');
-                    } catch(e) {}
-                }
+                // --- הפתרון: השהיה קטנטנה של 200ms לפני הדלקת המיקרופון ---
+                setTimeout(() => {
+                    if (mode === 'speak' && isDrivingMode) {
+                        try { 
+                            if (!recognition) initSpeech();
+                            recognition.start(); 
+                            isListening = true;
+                            let btn = document.getElementById('micBtn'); if(btn) btn.classList.add('mic-listening');
+                        } catch(e) {}
+                    }
+                }, 200);
 
                 drivingTimeout = setTimeout(() => {
                     // מכבים את המיקרופון שנייה לפני שהיא מקריאה עברית
@@ -1681,7 +1682,6 @@
 
             window.speechSynthesis.speak(enUtterance);
         }
-
         function initSpeech() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) return;
