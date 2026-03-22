@@ -546,17 +546,33 @@
 
         function applyFilters() {
             let sourceVal = document.getElementById('sourceFilter').value; let unitVal = document.getElementById('unitFilter').value; let levelVal = document.getElementById('levelFilter').value; let statusVal = document.getElementById('statusFilter').value; let searchVal = document.getElementById('searchInput').value.toLowerCase();
+            let now = Date.now();
+
             currentList = allWords.filter(w => {
                 let displayHe = editedTranslations[w.en] || w.he;
                 let matchSource = (sourceVal === 'All' || w.source === sourceVal); let matchUnit = (unitVal === 'All' || w.unit === unitVal); let matchLevel = (levelVal === 'All' || w.level === levelVal);
-                let wordStatus = (userProgress[w.en] && userProgress[w.en].status) ? userProgress[w.en].status : 'unseen'; let wordFails = (userProgress[w.en] && userProgress[w.en].fails) ? userProgress[w.en].fails : 0;
-                let matchStatus = true; if(statusVal === 'Known') matchStatus = (wordStatus === 'known'); if(statusVal === 'Learning') matchStatus = (wordStatus === 'learning'); if(statusVal === 'Unseen') matchStatus = (wordStatus === 'unseen'); if(statusVal === 'Hard') matchStatus = (wordFails >= 2); 
+                
+                let wordData = userProgress[w.en] || { status: 'unseen', fails: 0, nextReview: 0 };
+                let wordStatus = wordData.status; 
+                let wordFails = wordData.fails || 0;
+                let nextReview = wordData.nextReview || 0;
+
+                let matchStatus = true; 
+                if(statusVal === 'Known') matchStatus = (wordStatus === 'known'); 
+                if(statusVal === 'Learning') matchStatus = (wordStatus === 'learning'); 
+                if(statusVal === 'Unseen') matchStatus = (wordStatus === 'unseen'); 
+                if(statusVal === 'Hard') matchStatus = (wordFails >= 2); 
+                
+                // הפעלת האלגוריתם: אם לא חיפשנו ספציפית מילים שאנחנו יודעים, נסתיר מילים שהמוח עדיין זוכר
+                if (statusVal === 'All' && wordStatus === 'known' && nextReview > now) {
+                    matchStatus = false; 
+                }
+
                 let matchSearch = w.en.toLowerCase().includes(searchVal) || displayHe.includes(searchVal);
                 return matchSource && matchUnit && matchLevel && matchStatus && matchSearch;
             });
             currentIndex = 0; updateStatsUI(); if(currentMode === 'flash') updateCard(); else if(currentMode === 'quiz') startQuiz(); else if(currentMode === 'list') renderList();
         }
-
         function smartShuffle() {
             if(currentList.length === 0) return;
             currentList.sort((a, b) => {
@@ -571,16 +587,37 @@
 
         function prevCard() { if(currentIndex > 0) { currentIndex--; let card = document.getElementById('flashcard'); if (card.classList.contains('is-flipped')) { card.classList.remove('is-flipped'); setTimeout(() => { updateCard(); }, 300); } else { updateCard(); } } else { alert('זו המילה הראשונה ברשימה!'); } }
         
-        function markWord(newStatus) {
+       function markWord(newStatus) {
             if(currentList.length === 0) return; let wordEn = currentList[currentIndex].en;
-            if(!userProgress[wordEn]) userProgress[wordEn] = { status: 'unseen', fails: 0 };
+            if(!userProgress[wordEn]) userProgress[wordEn] = { status: 'unseen', fails: 0, reviewLevel: 0, nextReview: 0 };
+            
             userProgress[wordEn].status = newStatus;
+            let now = Date.now();
+            let dayInMs = 24 * 60 * 60 * 1000;
+
             if(newStatus === 'known') { 
                 streak++; 
                 if(streak > 0 && streak % 10 === 0) fireConfetti();
+                
+                // אלגוריתם חזרות מרווחות:
+                let currentLevel = userProgress[wordEn].reviewLevel || 0;
+                let daysToAdd = 1; // פעם ראשונה: נחזור עליה מחר
+                
+                if (currentLevel === 1) daysToAdd = 3;      // פעם שניה: עוד 3 ימים
+                else if (currentLevel === 2) daysToAdd = 7; // פעם שלישית: עוד שבוע
+                else if (currentLevel >= 3) daysToAdd = 14; // פעם רביעית ומעלה: עוד שבועיים
+                
+                userProgress[wordEn].nextReview = now + (daysToAdd * dayInMs);
+                userProgress[wordEn].reviewLevel = currentLevel + 1;
+
             } else if (newStatus === 'learning') { 
-                userProgress[wordEn].fails = (userProgress[wordEn].fails || 0) + 1; streak = 0; 
+                userProgress[wordEn].fails = (userProgress[wordEn].fails || 0) + 1; 
+                streak = 0; 
+                // איפוס האלגוריתם כי טעינו
+                userProgress[wordEn].reviewLevel = 0;
+                userProgress[wordEn].nextReview = 0; // יחזור מיד ללמידה
             }
+            
             saveProgress(); let card = document.getElementById('flashcard');
             if (card.classList.contains('is-flipped')) { card.classList.remove('is-flipped'); setTimeout(() => { advanceToNextCard(); }, 300); } else { advanceToNextCard(); }
         }
