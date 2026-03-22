@@ -703,13 +703,20 @@
                 window.speechSynthesis.cancel();
             }
         }
-
-        function playNextDrivingWord() {
+function playNextDrivingWord() {
             if(!isDrivingMode) return;
             if(currentIndex >= currentList.length) currentIndex = 0; 
             
             updateCard();
             window.speechSynthesis.cancel();
+            clearTimeout(drivingTimeout);
+            
+            // מוודאים שהמיקרופון כבוי לפני שמתחילים מילה חדשה
+            if (isListening && recognition) { 
+                try { recognition.stop(); } catch(e){} 
+                isListening = false; 
+                let btn = document.getElementById('micBtn'); if(btn) btn.classList.remove('mic-listening');
+            }
             
             let w = currentList[currentIndex];
             let displayHe = editedTranslations[w.en] || w.he;
@@ -731,7 +738,6 @@
             heUtterance.lang = 'he-IL';
             heUtterance.rate = 0.85;
 
-            // כאן השינוי: במקום הקראת פסיקים, משתמשים בשעון עצר
             enUtterance.onend = function() {
                 if(!isDrivingMode) return;
                 
@@ -739,11 +745,25 @@
                 transDiv.style.display = 'block';
 
                 let mode = document.getElementById('driveInteraction') ? document.getElementById('driveInteraction').value : 'speak';
-                
-                // זמן ההמתנה (כרגע מוגדר ל-3000 שזה 3 שניות)
                 let waitTime = (mode === 'listen') ? 1500 : 3000; 
 
-                setTimeout(() => {
+                // --- הקסם החדש: מדליקים את המיקרופון רק ל-3 שניות של ההמתנה! ---
+                if (mode === 'speak') {
+                    try { 
+                        if (!recognition) initSpeech();
+                        recognition.start(); 
+                        isListening = true;
+                        let btn = document.getElementById('micBtn'); if(btn) btn.classList.add('mic-listening');
+                    } catch(e) {}
+                }
+
+                drivingTimeout = setTimeout(() => {
+                    // מכבים את המיקרופון שנייה לפני שהיא מקריאה עברית
+                    if (isListening && recognition) { 
+                        try { recognition.stop(); } catch(e){} 
+                        isListening = false; 
+                        let btn = document.getElementById('micBtn'); if(btn) btn.classList.remove('mic-listening');
+                    }
                     if(isDrivingMode) window.speechSynthesis.speak(heUtterance);
                 }, waitTime);
             };
@@ -751,7 +771,7 @@
             heUtterance.onend = function() {
                 if(!isDrivingMode) return;
                 transDiv.style.display = 'none';
-                setTimeout(() => {
+                drivingTimeout = setTimeout(() => {
                     if(isDrivingMode) {
                         currentIndex++;
                         playNextDrivingWord();
@@ -759,6 +779,8 @@
                 }, 1500);
             };
 
+            window.speechSynthesis.speak(enUtterance);
+        }
             window.speechSynthesis.speak(enUtterance);
         }
         window.speechSynthesis.onvoiceschanged = function() {
