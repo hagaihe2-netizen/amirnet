@@ -1729,58 +1729,27 @@ function playNextDrivingWord() {
 
   function checkSpokenAnswer(spokenText) {
             if(currentList.length === 0) return;
-            
-            // עצירה מיידית של כל שעון עצר או הקראה קיימת כדי שלא ידרסו אותך
-            clearTimeout(drivingTimeout);
-            window.speechSynthesis.cancel();
-            
             let word = currentList[currentIndex];
             let correctHe = (editedTranslations[word.en] || word.he).toLowerCase();
+            
+            // מנקה סימני פיסוק מהזיהוי של הטלפון שיכולים להפריע
             let cleanSpoken = spokenText.replace(/[.,?!]/g, "").trim();
             
-            // בדיקת דילוג
             if (cleanSpoken.includes("דלג") || cleanSpoken.includes("לא יודע") || cleanSpoken.includes("עבור")) {
-                let fb = document.getElementById('micFeedback'); if(fb) fb.innerText = "מדלג...";
+                let fb = document.getElementById('micFeedback'); if(fb) fb.innerText = `אמרת: "לא יודע". מדלג...`;
+                clearTimeout(drivingTimeout); // הורג את שעון ה-3 שניות
+                window.speechSynthesis.cancel(); // משתיק כל הקראה שמתוכננת
                 if (isListening && recognition) { try { recognition.stop(); } catch(e){} isListening = false; }
                 
+                // פידבק קולי
                 let msg = new SpeechSynthesisUtterance("מדלג");
                 msg.lang = 'he-IL';
                 window.speechSynthesis.speak(msg);
                 
-                setTimeout(() => { markWord('learning'); }, 800);
+                // ממתין שנייה כדי שתשמע את המילה, ואז עובר
+                setTimeout(() => { markWord('learning'); }, 1000);
                 return;
             }
-
-            // לוגיקת זיהוי גמישה יותר (בודק אם המילה שאמרת מופיעה בתרגום)
-            let correctWords = correctHe.split(/[,|\/]/).map(w => w.trim());
-            let isCorrect = correctWords.some(cw => cleanSpoken === cw || cleanSpoken.includes(cw) || cw.includes(cleanSpoken));
-
-            if (isCorrect) {
-                let fb = document.getElementById('micFeedback'); if(fb) fb.innerText = "נכון מאוד!";
-                // השתקה סופית לפני הפידבק
-                window.speechSynthesis.cancel();
-                if (isListening && recognition) { try { recognition.stop(); } catch(e){} isListening = false; }
-                
-                let msg = new SpeechSynthesisUtterance("מעולה");
-                msg.lang = 'he-IL';
-                msg.rate = 1.2;
-                window.speechSynthesis.speak(msg);
-                
-                // עובר למילה הבאה רק אחרי ה"מעולה"
-                setTimeout(() => { markWord('known'); }, 1000);
-            } else {
-                let fb = document.getElementById('micFeedback'); if(fb) fb.innerText = `שמעתי "${cleanSpoken}" (נסה שוב)`;
-                // אם טעית, אנחנו מחזירים את השעון ל-2 שניות נוספות כדי לתת לך עוד צ'אנס לפני שהיא מגלה
-                drivingTimeout = setTimeout(() => {
-                    if(isDrivingMode) {
-                        let displayHe = editedTranslations[word.en] || word.he;
-                        let heUtterance = new SpeechSynthesisUtterance(displayHe);
-                        heUtterance.lang = 'he-IL';
-                        window.speechSynthesis.speak(heUtterance);
-                    }
-                }, 2000);
-            }
-        }
 
             let correctWords = correctHe.split(/[,|\/]/).map(w => w.trim());
             let isCorrect = correctWords.some(cw => cleanSpoken === cw || cleanSpoken.includes(cw) || cw.includes(cleanSpoken));
