@@ -124,7 +124,28 @@
         .edit-links { display: flex; gap: 15px; margin-top: 12px; justify-content: center; width: 100%;}
         .hint-edit { font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; cursor: pointer; background: none; border: none; opacity: 0.8; transition: 0.2s; font-family: 'Rubik', sans-serif; display: flex; align-items: center; gap: 4px;}
         .hint-edit svg { width: 14px; height: 14px; stroke: #64748b;}
-        .hint-edit:hover, .hint-edit:hover svg { color: var(--btn-primary); stroke: var(--btn-primary); opacity: 1;}
+        .hint-edit:hover, .hint-edit:hover svg { color: var(--btn-primary); stroke: var(--btn-primary); opacity: 1;}.action-btns { display: flex; gap: 6px; width: 100%; justify-content: space-between; align-items: center; direction: ltr; }
+        .btn-know, .btn-dontknow { flex: 1; height: 55px; font-size: 15px; font-family: 'Rubik', sans-serif; border-radius: 28px; border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); padding: 0; min-width: 0; }
+        .btn-know { background-color: #34c759; } .btn-know svg { stroke: white; width: 18px; height: 18px; flex-shrink: 0; } .btn-know:active { transform: scale(0.95); background-color: #2db34f;}
+        .btn-dontknow { background-color: #ff3b30; } .btn-dontknow svg { stroke: white; width: 18px; height: 18px; flex-shrink: 0; } .btn-dontknow:active { transform: scale(0.95); background-color: #e6352b;}
+        
+        .btn-stack { background-color: #5856d6; color: white; flex: 1.1; height: 55px; font-size: 14px; font-family: 'Rubik', sans-serif; border-radius: 28px; border: none; cursor: pointer; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); padding: 0; min-width: 0; }
+        .btn-stack:active { transform: scale(0.95); background-color: #4644b0; }
+        .btn-stack span.stack-count { font-size: 11px; font-weight: 600; opacity: 0.9; }
+
+        .stack-mode-btn { width: 100%; padding: 15px 20px; margin-bottom: 20px; border-radius: 16px; border: 2px solid #5856d6; background: rgba(88, 86, 214, 0.1); color: #5856d6; font-size: 18px; font-weight: 800; font-family: 'Rubik', sans-serif; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); box-sizing: border-box; }
+        .stack-mode-btn.active { background: #5856d6; color: white; animation: pulseStack 2s infinite; }
+        .stack-mode-btn svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2.5; fill: none; flex-shrink: 0; }
+        .stack-badge { background: #5856d6; color: white; padding: 4px 12px; border-radius: 12px; font-size: 15px; margin-right: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;}
+        .stack-mode-btn.active .stack-badge { background: white; color: #5856d6; }
+        @keyframes pulseStack { 0% { box-shadow: 0 0 0 0 rgba(88, 86, 214, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(88, 86, 214, 0); } 100% { box-shadow: 0 0 0 0 rgba(88, 86, 214, 0); } }
+        body.dark-mode .stack-mode-btn { background: rgba(88, 86, 214, 0.2); color: #a5a5ff; border-color: #a5a5ff; }
+        body.dark-mode .stack-mode-btn.active { background: #5856d6; color: white; border-color: #5856d6; }
+
+        .side-btn { width: 50px; height: 50px; border-radius: 25px; background: var(--panel-bg); border: 2px solid var(--border-color); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: var(--shadow); flex-shrink: 0; transition: 0.2s;}
+        .side-btn svg { stroke: #64748b; width: 22px; height: 22px; flex-shrink: 0; } 
+        body.dark-mode .side-btn svg { stroke: #94a3b8; }
+        .side-btn:active { transform: scale(0.9); }
 
         .action-btns { display: flex; gap: 15px; width: 100%; justify-content: space-between; align-items: center; direction: ltr; }.btn-know, .btn-dontknow { flex: 1; height: 60px; font-size: 19px; font-family: 'Rubik', sans-serif; border-radius: 30px; border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
         .btn-know { background-color: #34c759; } .btn-know svg { stroke: white; } .btn-know:active { transform: scale(0.95); background-color: #2db34f;}
