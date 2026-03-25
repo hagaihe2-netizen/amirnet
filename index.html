@@ -424,9 +424,8 @@
 
       async function initApp() {
             if(isDarkMode) document.body.classList.add('dark-mode');
-            
             // --- מנגנון שאיבת המילים מהשרת של גיטהאב ---
-            if (!localStorage.getItem('isFirstLoadComplete')) {
+            if (!localStorage.getItem('isFirstLoadComplete_V2')) {
                 try {
                     const response = await fetch('./vocab_backup.json');
                     if (response.ok) {
@@ -478,7 +477,7 @@
                 } catch (err) {
                     console.log("No backup file found on server, using default data.");
                 }
-                localStorage.setItem('isFirstLoadComplete', 'true');
+                localStorage.setItem('isFirstLoadComplete_V2', 'true');
             }
             // ------------------------------------
 
