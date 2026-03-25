@@ -128,10 +128,11 @@
         .btn-know, .btn-dontknow { flex: 1; height: 55px; font-size: 15px; font-family: 'Rubik', sans-serif; border-radius: 28px; border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); padding: 0; min-width: 0; }
         .btn-know { background-color: #34c759; } .btn-know svg { stroke: white; width: 18px; height: 18px; flex-shrink: 0; } .btn-know:active { transform: scale(0.95); background-color: #2db34f;}
         .btn-dontknow { background-color: #ff3b30; } .btn-dontknow svg { stroke: white; width: 18px; height: 18px; flex-shrink: 0; } .btn-dontknow:active { transform: scale(0.95); background-color: #e6352b;}
-        
-        .btn-stack { background-color: #5856d6; color: white; flex: 1.1; height: 55px; font-size: 14px; font-family: 'Rubik', sans-serif; border-radius: 28px; border: none; cursor: pointer; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); padding: 0; min-width: 0; }
-        .btn-stack:active { transform: scale(0.95); background-color: #4644b0; }
-        .btn-stack span.stack-count { font-size: 11px; font-weight: 600; opacity: 0.9; }
+        .btn-stack { background-color: rgba(88, 86, 214, 0.1); color: #5856d6; width: fit-content; align-self: center; height: 44px; padding: 0 24px; font-size: 15px; font-family: 'Rubik', sans-serif; border-radius: 22px; border: 2px solid rgba(88, 86, 214, 0.4); cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; margin-top: 5px;}
+        .btn-stack:active { transform: scale(0.95); background-color: rgba(88, 86, 214, 0.2); border-color: #5856d6; }
+        .btn-stack span.stack-count { font-size: 13px; font-weight: 800; background: #5856d6; color: white; padding: 2px 8px; border-radius: 10px; margin-right: 5px; }
+        body.dark-mode .btn-stack { background-color: rgba(165, 165, 255, 0.1); color: #a5a5ff; border-color: rgba(165, 165, 255, 0.4); }
+        body.dark-mode .btn-stack span.stack-count { background: #a5a5ff; color: #1e293b; }
 
         .stack-mode-btn { width: 100%; padding: 15px 20px; margin-bottom: 20px; border-radius: 16px; border: 2px solid #5856d6; background: rgba(88, 86, 214, 0.1); color: #5856d6; font-size: 18px; font-weight: 800; font-family: 'Rubik', sans-serif; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); box-sizing: border-box; }
         .stack-mode-btn.active { background: #5856d6; color: white; animation: pulseStack 2s infinite; }
@@ -145,14 +146,17 @@
         .side-btn { width: 50px; height: 50px; border-radius: 25px; background: var(--panel-bg); border: 2px solid var(--border-color); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: var(--shadow); flex-shrink: 0; transition: 0.2s;}
         .side-btn svg { stroke: #64748b; width: 22px; height: 22px; flex-shrink: 0; } 
         body.dark-mode .side-btn svg { stroke: #94a3b8; }
-        .side-btn:active { transform: scale(0.9); }
-
-        .action-btns { display: flex; gap: 15px; width: 100%; justify-content: space-between; align-items: center; direction: ltr; }.btn-know, .btn-dontknow { flex: 1; height: 60px; font-size: 19px; font-family: 'Rubik', sans-serif; border-radius: 30px; border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
+        .side-btn:active { transform: scale(0.9); }.action-btns-wrapper { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .action-btns { display: flex; gap: 15px; width: 100%; justify-content: space-between; align-items: center; direction: ltr; }
+        .btn-know, .btn-dontknow { flex: 1; height: 60px; font-size: 19px; font-family: 'Rubik', sans-serif; border-radius: 30px; border: none; color: white; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
         .btn-know { background-color: #34c759; } .btn-know svg { stroke: white; } .btn-know:active { transform: scale(0.95); background-color: #2db34f;}
         .btn-dontknow { background-color: #ff3b30; } .btn-dontknow svg { stroke: white; } .btn-dontknow:active { transform: scale(0.95); background-color: #e6352b;}
         
-        .btn-stack { background-color: #5856d6; color: white; flex: 1.2; height: 60px; font-size: 18px; font-family: 'Rubik', sans-serif; border-radius: 30px; border: none; cursor: pointer; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        .btn-stack:active { transform: scale(0.95); background-color: #4644b0; }.btn-stack span.stack-count { font-size: 13px; font-weight: 600; opacity: 0.9; }
+        .btn-stack { background-color: rgba(88, 86, 214, 0.1); color: #5856d6; width: fit-content; align-self: center; height: 44px; padding: 0 24px; font-size: 15px; font-family: 'Rubik', sans-serif; border-radius: 22px; border: 2px solid rgba(88, 86, 214, 0.4); cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; margin-top: 5px;}
+        .btn-stack:active { transform: scale(0.95); background-color: rgba(88, 86, 214, 0.2); border-color: #5856d6; }
+        .btn-stack span.stack-count { font-size: 13px; font-weight: 800; background: #5856d6; color: white; padding: 2px 8px; border-radius: 10px; margin-right: 5px; }
+        body.dark-mode .btn-stack { background-color: rgba(165, 165, 255, 0.1); color: #a5a5ff; border-color: rgba(165, 165, 255, 0.4); }
+        body.dark-mode .btn-stack span.stack-count { background: #a5a5ff; color: #1e293b; }
 
         .stack-mode-btn { width: 100%; padding: 15px 20px; margin-bottom: 20px; border-radius: 16px; border: 2px solid #5856d6; background: rgba(88, 86, 214, 0.1); color: #5856d6; font-size: 18px; font-weight: 800; font-family: 'Rubik', sans-serif; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); box-sizing: border-box; }
         .stack-mode-btn.active { background: #5856d6; color: white; animation: pulseStack 2s infinite; }
@@ -334,16 +338,19 @@
                         <div class="word-container"><div class="translation"><span id="wordBack">תרגום</span><button class="edit-icon" id="editTransBtn" onclick="editTranslation(event)"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button></div></div>
                     </div>
                 </div>
+            </div><div class="action-btns-wrapper">
+                <div class="action-btns" style="direction: ltr;">
+                    <button class="side-btn" onclick="prevCard()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+                    <button class="btn-know" onclick="markWord('known')">יודע <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
+                    <button class="btn-dontknow" onclick="markWord('learning')">לא יודע <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                    <button class="side-btn" onclick="speakWord()"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
+                </div>
+				<button class="btn-stack" onclick="toggleStackWord()">
+                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2.5;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                    חרישה
+                    <span class="stack-count" id="stackCountDisplay">0/10</span>
+                </button>
             </div>
-			<div class="action-btns" style="direction: ltr;">
-                <button class="side-btn" onclick="prevCard()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-                <button class="btn-know" onclick="markWord('known')">יודע <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
-                <button class="btn-stack" onclick="toggleStackWord()">לחרישה <span class="stack-count" id="stackCountDisplay">0/10</span></button>
-                <button class="btn-dontknow" onclick="markWord('learning')">לא יודע <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-                <button class="side-btn" onclick="speakWord()"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
-            </div>
-            <div style="color: #64748b; font-size: 16px; font-weight:800; margin-top:18px;" id="cardCounter" dir="ltr">1 / 100</div>
-        </div>
 
         <div id="quiz-section">
             <div class="quiz-question" id="quizQuestion" dir="ltr">Word</div>
