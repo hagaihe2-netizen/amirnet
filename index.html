@@ -760,16 +760,27 @@ function updateStatsUI() {
             
             let card = document.getElementById('flashcard'); if (card.classList.contains('is-flipped')) card.classList.remove('is-flipped');
         }
-function flipCard() { if (currentList.length > 0 && !isDrivingMode) document.getElementById('flashcard').classList.toggle('is-flipped'); }
+		function flipCard() { if (currentList.length > 0 && !isDrivingMode) document.getElementById('flashcard').classList.toggle('is-flipped'); }
         
-        // --- מערכת החלקות חכמה ונקייה (שמאלה=יודע, ימינה=לא יודע) ---
+        // --- מערכת החלקות מותאמת לאייפון (שמאלה=יודע, ימינה=לא יודע) ---
         let touchStartX = 0;
         let isDraggingCard = false;
-        let isSwiping = false; // משתנה שמונע מהכרטיסייה להיתקע!
+        let isSwiping = false; 
 
         function initSwipe() {
             let swipeCard = document.getElementById('swipeCardContainer');
             if(!swipeCard) return;
+
+            // מאזין קליק מובנה - מבטיח שהלחיצה תעבוד באייפון תמיד!
+            swipeCard.addEventListener('click', e => {
+                let targetEl = e.target.nodeType === 3 ? e.target.parentNode : e.target;
+                if(isDrivingMode || currentList.length === 0 || (targetEl.closest && targetEl.closest('.hint-container'))) return;
+                
+                // אם לא בוצעה החלקה, סימן שזו נגיעה קצרה (קליק) -> אז תהפוך את הכרטיסייה
+                if (!isSwiping) {
+                    flipCard();
+                }
+            });
 
             // --- תמיכה במסכי מגע (טלפון) ---
             swipeCard.addEventListener('touchstart', e => {
@@ -778,7 +789,7 @@ function flipCard() { if (currentList.length > 0 && !isDrivingMode) document.get
                 
                 touchStartX = e.changedTouches[0].clientX;
                 isDraggingCard = true;
-                isSwiping = false; // מאפסים בתחילת כל נגיעה
+                isSwiping = false; // איפוס המצב
                 swipeCard.classList.add('dragging');
                 swipeCard.classList.remove('animating');
             }, {passive: true});
@@ -788,8 +799,8 @@ function flipCard() { if (currentList.length > 0 && !isDrivingMode) document.get
                 let currentX = e.changedTouches[0].clientX;
                 let diffX = currentX - touchStartX;
                 
-                // הנה תיקון התקיעות: אם האצבע זזה יותר מ-45 פיקסלים, מבינים שזו החלקה
-                if (Math.abs(diffX) > 45) {
+                // מספיק תזוזה קטנה (15 פיקסלים) כדי להבין שזו החלקה ולא קליק
+                if (Math.abs(diffX) > 15) {
                     isSwiping = true; 
                 }
                 
@@ -800,30 +811,29 @@ function flipCard() { if (currentList.length > 0 && !isDrivingMode) document.get
             swipeCard.addEventListener('touchend', e => {
                 if(!isDraggingCard) return;
                 isDraggingCard = false;
-                let touchEndX = e.changedTouches[0].clientX;
-                let diffX = touchEndX - touchStartX;
+                let diffX = e.changedTouches[0].clientX - touchStartX;
 
                 swipeCard.classList.remove('dragging');
                 swipeCard.classList.add('animating');
 
                 if (isSwiping) {
-                    if (diffX < -90) { // שמאלה - יודע
+                    if (diffX < -70) { // שמאלה - יודע
                         swipeCard.style.transform = `translateX(-150%) rotate(-20deg)`;
                         swipeCard.style.opacity = '0';
                         setTimeout(() => { markWord('known'); }, 250);
-                    } else if (diffX > 90) { // ימינה - לא יודע
+                    } else if (diffX > 70) { // ימינה - לא יודע
                         swipeCard.style.transform = `translateX(150%) rotate(20deg)`;
                         swipeCard.style.opacity = '0';
                         setTimeout(() => { markWord('learning'); }, 250);
-                    } else { // לא משך מספיק - חזרה למרכז
+                    } else { // משך קצת והתחרט - חזרה למרכז
                         swipeCard.style.transform = `translateX(0px) rotate(0deg)`;
                         swipeCard.style.opacity = '1';
+                        // מחזירים למצב שאפשר להקליק אחרי חצי שנייה
+                        setTimeout(() => { isSwiping = false; }, 50);
                     }
                 } else {
-                    // קליק נקי בלי לזוז! הופכים את הכרטיסייה
                     swipeCard.style.transform = `translateX(0px) rotate(0deg)`;
                     swipeCard.style.opacity = '1';
-                    flipCard(); 
                 }
             });
             
@@ -840,7 +850,7 @@ function flipCard() { if (currentList.length > 0 && !isDrivingMode) document.get
             window.addEventListener('mousemove', e => {
                 if (!isDraggingCard) return;
                 let diffX = e.clientX - touchStartX;
-                if (Math.abs(diffX) > 45) isSwiping = true; 
+                if (Math.abs(diffX) > 15) isSwiping = true; 
                 let rotate = diffX * 0.05; 
                 swipeCard.style.transform = `translateX(${diffX}px) rotate(${rotate}deg)`;
             });
@@ -848,29 +858,31 @@ function flipCard() { if (currentList.length > 0 && !isDrivingMode) document.get
                 if(!isDraggingCard) return;
                 isDraggingCard = false;
                 let diffX = e.clientX - touchStartX;
+                
                 swipeCard.classList.remove('dragging');
                 swipeCard.classList.add('animating');
                 
                 if (isSwiping) {
-                    if (diffX < -90) { 
+                    if (diffX < -70) { 
                         swipeCard.style.transform = `translateX(-150%) rotate(-20deg)`;
                         swipeCard.style.opacity = '0';
                         setTimeout(() => { markWord('known'); }, 250);
-                    } else if (diffX > 90) { 
+                    } else if (diffX > 70) { 
                         swipeCard.style.transform = `translateX(150%) rotate(20deg)`;
                         swipeCard.style.opacity = '0';
                         setTimeout(() => { markWord('learning'); }, 250);
                     } else {
                         swipeCard.style.transform = `translateX(0px) rotate(0deg)`;
                         swipeCard.style.opacity = '1';
+                        setTimeout(() => { isSwiping = false; }, 50);
                     }
                 } else {
                     swipeCard.style.transform = `translateX(0px) rotate(0deg)`;
                     swipeCard.style.opacity = '1';
-                    flipCard(); 
                 }
             });
         }
+      
         // ---------- מצב נסיעה חדש, יציב ואייפון-פרנדלי ----------
         let isDrivingMode = false;
         
