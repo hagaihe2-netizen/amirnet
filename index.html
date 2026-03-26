@@ -63,6 +63,9 @@
         .chart-label { font-size: 11px; color: #64748b; font-weight: 600; }
         body.dark-mode .chart-label { color: #94a3b8; }
         .chart-val { font-size: 11px; color: var(--text-color); font-weight: 800; margin-bottom: -2px;}
+		.toggle-chart-btn { background: none; border: none; color: var(--btn-primary); font-family: 'Rubik', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 15px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 6px; opacity: 0.8; transition: 0.2s; }
+        .toggle-chart-btn:hover { opacity: 1; }
+        .toggle-chart-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.5; fill: none;}
         .app-screen { width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; }
 
         .controls-panel { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
@@ -290,7 +293,8 @@
             <div class="streak" id="streakDisplay"><svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2"><path d="M17.657 14.832c0 2.871-2.42 5.168-5.657 5.168-3.237 0-5.657-2.297-5.657-5.168 0-2.41 1.76-4.524 4.026-5.048-.68 1.48-.124 2.83.63 3.655.087-.96.657-2.203 1.95-3.327 1.848-1.606 2.37-3.953 2.062-6.112 3.037 2.274 4.613 5.485 4.613 8.214a1.002 1.002 0 0 1-.005.105c-.015-.436-.184-1.078-.616-1.895 1.09 1.155 1.654 2.716 1.654 4.408z"/></svg> רצף: 0</div>
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
             <div class="stats-text"><span id="statsKnown" class="stat-known">יודע: 0</span><span id="statsLearning" class="stat-learning">ללמידה: 0</span><span id="statsUnseen" class="stat-unseen">טרם מוין: 0</span></div>
-			<div class="chart-container" id="weeklyChart"></div>
+<button class="toggle-chart-btn" onclick="toggleChart()" id="chartToggleBtn"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> הצג גרף התקדמות</button>
+            <div class="chart-container" id="weeklyChart" style="display: none;"></div>			
         </div>
 <div class="controls-panel">
             <div class="search-container">
@@ -589,17 +593,29 @@
         function switchMode(mode) { currentMode = mode; document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.getElementById(`tab-${mode}`).classList.add('active'); document.getElementById('flashcard-section').style.display = (mode === 'flash') ? 'flex' : 'none'; document.getElementById('quiz-section').style.display = (mode === 'quiz') ? 'flex' : 'none'; document.getElementById('list-section').style.display = (mode === 'list') ? 'flex' : 'none'; if(mode === 'flash') updateCard(); if(mode === 'quiz') startQuiz(); if(mode === 'list') renderList(); }
         
         function saveProgress() { localStorage.setItem('vocabProgress', JSON.stringify(userProgress)); localStorage.setItem('vocabStreak', streak); localStorage.setItem('editedTranslations', JSON.stringify(editedTranslations)); localStorage.setItem('customSentences', JSON.stringify(customSentences)); localStorage.setItem('customAssocs', JSON.stringify(customAssocs)); updateStatsUI(); }
-
-        function updateStatsUI() {
+function updateStatsUI() {
             let sourceVal = document.getElementById('sourceFilter').value; let unitVal = document.getElementById('unitFilter').value; let levelVal = document.getElementById('levelFilter').value;
             let relevantWords = allWords.filter(w => { return (sourceVal === 'All' || w.source === sourceVal) && (unitVal === 'All' || w.unit === unitVal) && (levelVal === 'All' || w.level === levelVal); });
             let knownCount = 0; let learningCount = 0;
             relevantWords.forEach(w => { let st = (userProgress[w.en] && userProgress[w.en].status) ? userProgress[w.en].status : 'unseen'; if(st === 'known') knownCount++; if(st === 'learning') learningCount++; });
             let unseenCount = relevantWords.length - knownCount - learningCount; let percentage = relevantWords.length > 0 ? (knownCount / relevantWords.length) * 100 : 0;
             document.getElementById('statsKnown').innerText = `יודע: ${knownCount}`; document.getElementById('statsLearning').innerText = `ללמידה: ${learningCount}`; document.getElementById('statsUnseen').innerText = `טרם מוין: ${unseenCount}`; document.getElementById('progressFill').style.width = percentage + '%'; document.getElementById('streakDisplay').innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2"><path d="M17.657 14.832c0 2.871-2.42 5.168-5.657 5.168-3.237 0-5.657-2.297-5.657-5.168 0-2.41 1.76-4.524 4.026-5.048-.68 1.48-.124 2.83.63 3.655.087-.96.657-2.203 1.95-3.327 1.848-1.606 2.37-3.953 2.062-6.112 3.037 2.274 4.613 5.485 4.613 8.214a1.002 1.002 0 0 1-.005.105c-.015-.436-.184-1.078-.616-1.895 1.09 1.155 1.654 2.716 1.654 4.408z"/></svg> רצף: ${streak}`;
-			renderChart();
+            renderChart();
         }
-		function renderChart() {
+
+        function toggleChart() {
+            let chart = document.getElementById('weeklyChart');
+            let btn = document.getElementById('chartToggleBtn');
+            if (chart.style.display === 'none') {
+                chart.style.display = 'flex';
+                btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> הסתר גרף';
+            } else {
+                chart.style.display = 'none';
+                btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> הצג גרף התקדמות';
+            }
+        }
+
+        function renderChart() {
             let chartDiv = document.getElementById('weeklyChart');
             if(!chartDiv) return;
             let dailyStats = JSON.parse(localStorage.getItem('dailyStats')) || {};
@@ -625,7 +641,6 @@
             });
             chartDiv.innerHTML = html;
         }
-
         function applyFilters() {
             let sourceVal = document.getElementById('sourceFilter').value; let unitVal = document.getElementById('unitFilter').value; let levelVal = document.getElementById('levelFilter').value; let statusVal = document.getElementById('statusFilter').value; let searchVal = document.getElementById('searchInput').value.toLowerCase();
             let now = Date.now();
