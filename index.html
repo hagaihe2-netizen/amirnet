@@ -854,24 +854,17 @@ function updateStatsUI() {
                 let rotate = diffX * 0.05; 
                 swipeCard.style.transform = `translateX(${diffX}px) rotate(${rotate}deg)`;
             });
-            window.addEventListener('mouseup', e => {
+			window.addEventListener('mouseup', e => {
                 if(!isDraggingCard) return;
                 isDraggingCard = false;
                 let diffX = e.clientX - touchStartX;
-                
                 swipeCard.classList.remove('dragging');
                 swipeCard.classList.add('animating');
                 
                 if (isSwiping) {
-                    if (diffX < -70) { 
-                        swipeCard.style.transform = `translateX(-150%) rotate(-20deg)`;
-                        swipeCard.style.opacity = '0';
-                        setTimeout(() => { markWord('known'); }, 250);
-                    } else if (diffX > 70) { 
-                        swipeCard.style.transform = `translateX(150%) rotate(20deg)`;
-                        swipeCard.style.opacity = '0';
-                        setTimeout(() => { markWord('learning'); }, 250);
-                    } else {
+                    if (diffX < -70) { markWord('known'); } 
+                    else if (diffX > 70) { markWord('learning'); }
+                    else {
                         swipeCard.style.transform = `translateX(0px) rotate(0deg)`;
                         swipeCard.style.opacity = '1';
                         setTimeout(() => { isSwiping = false; }, 50);
@@ -882,11 +875,22 @@ function updateStatsUI() {
                 }
             });
         }
-      
+
+        // --- הפונקציה שמחזירה את הרמקול לחיים ---
+        function speakWord() { 
+            if (currentList.length === 0) return; 
+            window.speechSynthesis.cancel(); // ניקוי חובה לאייפון
+            let msg = new SpeechSynthesisUtterance(currentList[currentIndex].en); 
+            msg.lang = 'en-US'; 
+            msg.rate = 0.8;
+            window.speechSynthesis.speak(msg); 
+        }
+
         // ---------- מצב נסיעה חדש, יציב ואייפון-פרנדלי ----------
         let isDrivingMode = false;
         
         function toggleDrivingMode() {
+            isDrivingMode = !isDrivingMode;
             isDrivingMode = !isDrivingMode;
             let btn = document.getElementById('driveModeBtn');
             let transDiv = document.getElementById('wordTranslationDrive');
