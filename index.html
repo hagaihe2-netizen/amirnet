@@ -807,7 +807,7 @@ function updateStatsUI() {
                 } else { // משיכה קצרה - חזרה למרכז
                     swipeCard.style.transform = `translateX(0px) rotate(0deg)`;
                     swipeCard.style.opacity = '1';
-                    if (Math.abs(diffX) < 10) flipCard(); // קליק קצר = היפוך כרטיסיה
+                    if (Math.abs(diffX) < 45) flipCard();
                 }
             });
             
@@ -843,7 +843,7 @@ function updateStatsUI() {
                 } else {
                     swipeCard.style.transform = `translateX(0px) rotate(0deg)`;
                     swipeCard.style.opacity = '1';
-                    if (Math.abs(diffX) < 10) flipCard();
+                    if (Math.abs(diffX) < 45) flipCard();
                 }
             });
         }
